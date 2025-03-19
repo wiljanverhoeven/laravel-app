@@ -13,3 +13,7 @@ Route::get('booking', function () {
 Route::get('payment', function () {
     return view('payment');
 });
+
+Route::get('festivals', function () {
+    return view('festivals');
+});
