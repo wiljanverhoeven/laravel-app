@@ -8,11 +8,7 @@ class Passenger extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
+    
     protected $fillable = [
         'booking_id',
         'first_name',
@@ -22,17 +18,13 @@ class Passenger extends Model
         'special_requirements',
     ];
 
-    /**
-     * Get the booking that this passenger is associated with.
-     */
+    
     public function booking()
     {
         return $this->belongsTo(Booking::class);
     }
 
-    /**
-     * Get the full name of the passenger.
-     */
+    
     public function getFullNameAttribute()
     {
         return "{$this->first_name} {$this->last_name}";
