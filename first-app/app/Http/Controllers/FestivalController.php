@@ -11,8 +11,8 @@ class FestivalController extends Controller
    
     public function index()
     {
-        $festival = Festival::all(); // Get all festivals from the database
-        return view('festivals', compact('festival')); // Pass to view
+        $festivals = Festival::with('busRoutes')->get();
+        return view('festivals', compact('festivals'));
         
     
     }

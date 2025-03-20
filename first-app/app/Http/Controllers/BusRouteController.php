@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Festival;
 use Illuminate\Http\Request;
 
 class BusRouteController extends Controller
@@ -15,7 +16,8 @@ class BusRouteController extends Controller
    
     public function create()
     {
-        
+        $festivals = Festival::with('busRoutes')->get(); // Fetch festivals with bus routes
+        return view('busses', compact('festivals')); // Pass to the Blade file
     }
 
    
