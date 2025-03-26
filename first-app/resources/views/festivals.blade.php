@@ -11,14 +11,13 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($festival as $item)
+        @foreach ($festivals as $item) {{-- Fix variable name --}}
         <tr>
             <td>{{ $item->id }}</td>
             <td>{{ $item->name }}</td>
             <td>{{ $item->location }}</td>
             <td>{{ $item->start_date->format('Y-m-d H:i') }}</td>
             <td>{{ $item->end_date->format('Y-m-d H:i') }}</td>
-           
         </tr>
         @endforeach
     </tbody>

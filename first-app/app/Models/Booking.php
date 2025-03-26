@@ -36,12 +36,6 @@ class Booking extends Model
         return $this->belongsTo(BusRoute::class);
     }
 
-   
-    public function returnBooking()
-    {
-        return $this->hasOne(ReturnBooking::class);
-    }
-
     
     public function payment()
     {

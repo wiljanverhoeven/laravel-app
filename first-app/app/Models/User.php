@@ -1,47 +1,63 @@
 <?php
 
-// app/Models/User.php
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use Notifiable;
 
-    
+   
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'phone_number',
-        'address',
+        'name', 'email', 'password', 'points', 'total_bus_bookings', 'last_bus_booking_date', 'loyalty_tier'
     ];
 
-    
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
-
-    
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-    ];
-
-    
-    public function bookings()
+   
+    public function addPoints(int $pointsToAdd)
     {
-        return $this->hasMany(Booking::class);
+        $this->points += $pointsToAdd;
+        $this->updateLoyaltyTier();
+        $this->save();
     }
 
-    
-    public function reviews()
+   
+    public function deductPoints(int $pointsToDeduct)
     {
-        return $this->hasMany(Review::class);
+        if ($this->points >= $pointsToDeduct) {
+            $this->points -= $pointsToDeduct;
+            $this->updateLoyaltyTier();
+            $this->save();
+            return true;
+        }
+        return false;
+    }
+
+  
+    public function recordBusBooking(int $bookingPoints = 10)
+    {
+        $this->total_bus_bookings++;
+        $this->last_bus_booking_date = now();
+        $this->addPoints($bookingPoints);
+    }
+
+  
+    protected function updateLoyaltyTier()
+    {
+        if ($this->points < 100) {
+            $this->loyalty_tier = 'bronze';
+        } elseif ($this->points < 500) {
+            $this->loyalty_tier = 'silver';
+        } elseif ($this->points < 1000) {
+            $this->loyalty_tier = 'gold';
+        } else {
+            $this->loyalty_tier = 'platinum';
+        }
+    }
+
+    public function scopeLoyaltyTier($query, $tier)
+    {
+        return $query->where('loyalty_tier', $tier);
     }
 }

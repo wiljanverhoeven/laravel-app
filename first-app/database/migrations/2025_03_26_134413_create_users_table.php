@@ -4,10 +4,9 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateUsersTable extends Migration
 {
-    
-    public function up(): void
+    public function up()
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
@@ -15,16 +14,19 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('phone_number', 20)->nullable();
-            $table->text('address')->nullable();
+            
+            // New columns for bus bookings and points
+            $table->integer('points')->default(0);
+            $table->integer('total_bus_bookings')->default(0);
+            $table->date('last_bus_booking_date')->nullable();
+            
             $table->rememberToken();
             $table->timestamps();
         });
     }
 
-    
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('users');
     }
-};
+}
