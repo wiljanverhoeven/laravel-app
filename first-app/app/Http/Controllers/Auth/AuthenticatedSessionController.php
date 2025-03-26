@@ -21,8 +21,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Optional: Add custom logic after successful login
-        // For example, updating last login time
         $user = Auth::user();
         $user->last_login_at = now();
         $user->save();
