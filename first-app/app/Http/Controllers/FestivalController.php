@@ -11,8 +11,8 @@ class FestivalController extends Controller
    
     public function index()
     {
-        $festivals = Festival::with('busRoutes')->paginate(10); // Paginate results
-        return view('festivals', compact('festivals'));
+        $festival = Festival::with('busRoutes')->paginate(10); // Paginate results
+        return view('festivals', compact('festival'));
     }   
 
   

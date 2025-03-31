@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->integer('points')->default(0);
             $table->integer('total_bus_bookings')->default(0);
             $table->date('last_bus_booking_date')->nullable();
+            $table->timestamp('last_login_at')->nullable();
             
             $table->rememberToken();
             $table->timestamps();

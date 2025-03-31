@@ -45,7 +45,6 @@ class RegisteredUserController extends Controller
             // Optional: Initialize points or other custom fields
             'points' => 0,
             'total_bus_bookings' => 0,
-            'loyalty_tier' => 'bronze'
         ]);
 
         event(new Registered($user));

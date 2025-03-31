@@ -42,22 +42,4 @@ class User extends Authenticatable
         $this->addPoints($bookingPoints);
     }
 
-  
-    protected function updateLoyaltyTier()
-    {
-        if ($this->points < 100) {
-            $this->loyalty_tier = 'bronze';
-        } elseif ($this->points < 500) {
-            $this->loyalty_tier = 'silver';
-        } elseif ($this->points < 1000) {
-            $this->loyalty_tier = 'gold';
-        } else {
-            $this->loyalty_tier = 'platinum';
-        }
-    }
-
-    public function scopeLoyaltyTier($query, $tier)
-    {
-        return $query->where('loyalty_tier', $tier);
-    }
 }

@@ -11,7 +11,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach ($festivals as $item) {{-- Fix variable name --}}
+        @foreach ($festival as $item) {{-- Fix variable name --}}
         <tr>
             <td>{{ $item->id }}</td>
             <td>{{ $item->name }}</td>

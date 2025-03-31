@@ -3,48 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Booking;
 
 class PaymentController extends Controller
 {
-   
-    public function index()
+    public function show(Booking $booking)
     {
-        
+        return view('payment', compact('booking'));
     }
 
-   
-    public function create()
+    public function process(Request $request)
     {
-    
+        $booking = Booking::findOrFail($request->booking_id);
+        $booking->update([
+            'payment_status' => 'paid',
+            'status' => 'confirmed',
+        ]);
+
+        return redirect()->route('booking.confirmation', ['booking' => $booking->id]);
+    }
+    public function confirm(Booking $booking)
+    {
+        return view('payment', compact('booking'));
     }
 
-   
-    public function store(Request $request)
+    public function confirm($bookingId)
     {
-        
-    }
-
-   
-    public function show(string $id)
-    {
-        
-    }
-
-    
-    public function edit(string $id)
-    {
-        
-    }
-
-   
-    public function update(Request $request, string $id)
-    {
-        
-    }
-
-  
-    public function destroy(string $id)
-    {
-        
+        $booking = Booking::findOrFail($bookingId);
+        return view('payment', compact('booking'));
     }
 }

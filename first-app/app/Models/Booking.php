@@ -59,7 +59,7 @@ class Booking extends Model
     {
         $reference = strtoupper(substr(uniqid(), -6)) . strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 4));
         
-        // Make sure it's unique
+       
         while (self::where('booking_reference', $reference)->exists()) {
             $reference = strtoupper(substr(uniqid(), -6)) . strtoupper(substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 4));
         }
