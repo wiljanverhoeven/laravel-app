@@ -41,6 +41,7 @@ class BusRoute extends Model
         return $this->hasMany(Booking::class);
     }
 
+
     
     public function remainingSeats()
     {

@@ -12,7 +12,7 @@ class BusRouteController extends Controller
     {
         
     }
-
+    
    
     public function create()
     {

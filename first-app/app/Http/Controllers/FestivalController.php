@@ -15,7 +15,6 @@ class FestivalController extends Controller
         return view('festivals', compact('festival'));
     }   
 
-  
     public function create()
     {
       

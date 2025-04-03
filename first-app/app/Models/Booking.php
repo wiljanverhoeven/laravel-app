@@ -54,6 +54,13 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function festival()
+    {
+        return $this->belongsTo(Festival::class);
+    }
+
+
+
     
     public static function generateBookingReference()
     {

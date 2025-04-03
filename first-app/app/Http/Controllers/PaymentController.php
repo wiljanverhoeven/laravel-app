@@ -26,10 +26,4 @@ class PaymentController extends Controller
     {
         return view('payment', compact('booking'));
     }
-
-    public function confirm($bookingId)
-    {
-        $booking = Booking::findOrFail($bookingId);
-        return view('payment', compact('booking'));
-    }
 }

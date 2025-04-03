@@ -34,6 +34,11 @@ class Festival extends Model
         return $this->hasMany(BusRoute::class);
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
     
     
 }
