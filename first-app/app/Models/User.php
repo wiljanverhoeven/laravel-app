@@ -42,4 +42,9 @@ class User extends Authenticatable
         $this->addPoints($bookingPoints);
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
 }

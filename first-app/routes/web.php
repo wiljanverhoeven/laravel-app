@@ -4,14 +4,11 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\FestivalController;
 use App\Http\Controllers\BusRouteController;
-use app\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\AccountController;
 
 Route::get('/', function () {return view('home');})->name('home');
-
-Route::get('busses', function () {return view('busses');});
 
 Route::get('payment', function () {return view('payment');});
 
@@ -34,6 +31,10 @@ Route::get('festivals', [FestivalController::class, 'index']);
 Route::get('busses', [BusRouteController::class, 'create']);
 
 Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/account', [AccountController::class, 'index'])->name('account');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

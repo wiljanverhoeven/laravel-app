@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Festival;
+use app\Models\BusRoute;
+use Illuminate\Database\Eloquent\Model;
 
 class FestivalController extends Controller
 {
@@ -19,6 +21,7 @@ class FestivalController extends Controller
     {
       
     }
+
 
     
     public function store(Request $request)
