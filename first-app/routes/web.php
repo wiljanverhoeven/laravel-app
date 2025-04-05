@@ -8,6 +8,8 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminBusRouteController;
+use App\Http\Controllers\AdminFestivalController;
 use App\Models\Festival;
 
 Route::get('/busroute', [BusRouteController::class, 'create'])->name('busroute.create');
@@ -34,8 +36,6 @@ Route::get('/payment/{booking}', [PaymentController::class, 'confirm'])->name('p
 
 Route::get('festivals', [FestivalController::class, 'index']);
 
-Route::get('/dashboard', function () {return view('dashboard');})->middleware(['auth', 'verified'])->name('dashboard');
-
 Route::middleware(['auth'])->group(function () {
     Route::get('/account', [AccountController::class, 'index'])->name('account');
 });
@@ -46,6 +46,21 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth'])->name('dashboard');
 
+Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+    
+
+Route::get('/festivals/create', [AdminFestivalController::class, 'create'])->name('admin.festivals.create');
+Route::post('/festivals', [AdminFestivalController::class, 'store'])->name('admin.festivals.store');
+Route::get('/festivals/{festival}/edit', [AdminFestivalController::class, 'edit'])->name('admin.festivals.edit');
+Route::put('/festivals/{festival}', [AdminFestivalController::class, 'update'])->name('admin.festivals.update');
+    
+Route::get('/busroutes/create', [AdminBusRouteController::class, 'create'])->name('admin.busroutes.create');
+Route::post('/busroutes', [AdminBusRouteController::class, 'store'])->name('admin.busroutes.store');
+Route::get('/busroutes/{busRoute}/edit', [AdminBusRouteController::class, 'edit'])->name('admin.busroutes.edit');
+Route::put('/busroutes/{busRoute}', [AdminBusRouteController::class, 'update'])->name('admin.busroutes.update');
 
 require __DIR__.'/auth.php';

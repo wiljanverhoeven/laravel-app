@@ -20,6 +20,11 @@
     @endguest
 
     @auth
+
+         @if(auth()->user()->hasRole('admin'))
+            <a href="{{ route('admin.dashboard') }}">Admin Dashboard</a> </br>
+        @endif
+
         <a href="{{ route('account') }}">My Account</a> </br>
 
         <a href="{{ route('logout') }}"

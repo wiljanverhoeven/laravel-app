@@ -7,12 +7,7 @@ use Illuminate\Http\Request;
 
 class BusRouteController extends Controller
 {
-    
-    public function index()
-    {
-        
-    }
-    
+
    
     public function create(Request $request)
     {
@@ -29,34 +24,6 @@ class BusRouteController extends Controller
         return view('busses', compact('festival', 'busRoutes'));
     }
 
-
-   
-    public function store(Request $request)
-    {
-        
-    }
-
-   
-    public function show(string $id)
-    {
-       
-    }
-
-  
-    public function edit(string $id)
-    {
-        
-    }
-
     
-    public function update(Request $request, string $id)
-    {
-        
-    }
 
-   
-    public function destroy(string $id)
-    {
-        
-    }
 }

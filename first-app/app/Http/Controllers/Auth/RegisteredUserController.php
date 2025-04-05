@@ -38,6 +38,7 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -46,10 +47,16 @@ class RegisteredUserController extends Controller
             'points' => 0,
         ]);
 
+        // Automatically assign the 'user' role to the new user
+        $user->assignRole('user'); // Make sure 'user' role exists in the database
+
+        // Fire the Registered event
         event(new Registered($user));
 
+        // Log the user in
         Auth::login($user);
 
+        // Redirect to the dashboard or another page
         return redirect(route('dashboard'));
     }
 }
