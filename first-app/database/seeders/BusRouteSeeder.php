@@ -62,7 +62,6 @@ class BusRouteSeeder extends Seeder
             'festival_id' => $festival->id,
             'departure_location' => $startCity, // use 'departure_location' instead of 'departure_city'
             'departure_address' => 'Unknown', // Add a placeholder for departure address
-            'departure_coordinates' => 'Unknown', // You can replace this with real coordinates if needed
             'departure_date' => $departureDate,
             'arrival_date' => $returnDate, // Use the return date as arrival date
             'capacity' => 50,

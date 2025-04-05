@@ -14,7 +14,6 @@ return new class extends Migration
             $table->foreignId('festival_id')->constrained('festivals')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('bus_route_id')->constrained('bus_routes')->onDelete('cascade');
-
             $table->string('booking_reference', 20)->unique();
             $table->integer('number_of_seats')->default(1);
             $table->decimal('total_price', 10, 2);

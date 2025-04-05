@@ -14,10 +14,10 @@ class ProfileController extends Controller
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit()
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => Auth::user(),
         ]);
     }
 
@@ -40,21 +40,16 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
+        // Delete the authenticated user
+        $user = Auth::user();
         $user->delete();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        // Log out the user after deletion
+        Auth::logout();
 
-        return Redirect::to('/');
+        // Redirect to the homepage with a success message
+        return redirect('/')->with('status', 'Your account has been deleted.');
     }
 }

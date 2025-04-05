@@ -14,12 +14,11 @@ return new class extends Migration
             $table->foreignId('festival_id')->constrained()->onDelete('cascade');
             $table->string('departure_location');
             $table->text('departure_address');
-            $table->string('departure_coordinates', 50)->nullable()->comment('Latitude,Longitude');
             $table->dateTime('departure_date');
             $table->dateTime('arrival_date');
             $table->integer('capacity');
             $table->decimal('price', 10, 2);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(false);
             $table->timestamps();
         });
     }

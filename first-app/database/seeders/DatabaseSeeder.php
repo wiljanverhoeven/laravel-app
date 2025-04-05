@@ -3,6 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\RolesAndPermissionsSeeder;
+
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +17,9 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             FestivalSeeder::class,
             BusRouteSeeder::class,
-            ReturnBusRouteSeeder::class,
             BookingSeeder::class,
-            ReturnBookingSeeder::class,
-            PassengerSeeder::class,
-            PaymentSeeder::class,
-            ReviewSeeder::class,
+            RolesAndPermissionsSeeder::class
+            
         ]);
     }
 }

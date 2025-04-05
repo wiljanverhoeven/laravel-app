@@ -42,17 +42,6 @@ class Booking extends Model
         return $this->hasOne(Payment::class);
     }
 
-    
-    public function passengers()
-    {
-        return $this->hasMany(Passenger::class);
-    }
-
-    
-    public function review()
-    {
-        return $this->hasOne(Review::class);
-    }
 
     public function festival()
     {

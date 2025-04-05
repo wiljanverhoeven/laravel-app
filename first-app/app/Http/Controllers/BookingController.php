@@ -108,6 +108,9 @@ class BookingController extends Controller
         // Add 1 point for booking
         $user->points += 1;
         $user->save();
+
+        $busRoute->capacity -= $bookingData['seats'];
+        $busRoute->save();
         
         // Clear the session booking data
         session()->forget('booking');
@@ -119,12 +122,20 @@ class BookingController extends Controller
     
     public function store(Request $request)
     {
+        // First validate the input
         $request->validate([
             'festival_id' => 'required|exists:festivals,id',
             'bus_route_id' => 'required|exists:bus_routes,id',
             'seats' => 'required|integer|min:1',
         ]);
-    
+
+        // Then fetch the route and check capacity
+        $busRoute = BusRoute::findOrFail($request->bus_route_id);
+
+        if ($request->seats > $busRoute->capacity) {
+            return back()->withErrors(['seats' => 'Not enough seats available.']);
+        }
+
         // Store booking details in session before payment
         session([
             'booking' => [
@@ -133,10 +144,12 @@ class BookingController extends Controller
                 'seats' => $request->seats,
             ]
         ]);
-    
+
         // Redirect to the payment page
         return redirect()->route('payment');
     }
+
+
 
     public function confirmation(Booking $booking, Request $request)
     {

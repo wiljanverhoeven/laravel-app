@@ -14,13 +14,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            
-            // New columns for bus bookings and points
             $table->integer('points')->default(0);
-            $table->integer('total_bus_bookings')->default(0);
-            $table->date('last_bus_booking_date')->nullable();
             $table->timestamp('last_login_at')->nullable();
-            
             $table->rememberToken();
             $table->timestamps();
         });

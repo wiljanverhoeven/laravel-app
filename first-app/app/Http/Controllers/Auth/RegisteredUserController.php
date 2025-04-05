@@ -44,7 +44,6 @@ class RegisteredUserController extends Controller
             'password' => Hash::make($request->password),
             // Optional: Initialize points or other custom fields
             'points' => 0,
-            'total_bus_bookings' => 0,
         ]);
 
         event(new Registered($user));

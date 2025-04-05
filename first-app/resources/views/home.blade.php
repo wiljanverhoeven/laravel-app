@@ -1,7 +1,17 @@
 <x-layout>
     <h1>Welcome</h1>
 
-    <a href='/busses'>Busses</a> </br>
+    <form action="{{ route('busroute.create') }}" method="GET">
+        <label for="festival">Choose a Festival:</label>
+        <select name="festival_id" id="festival" required>
+            @foreach($festivals as $festival)
+                <option value="{{ $festival->id }}">{{ $festival->name }}</option>
+            @endforeach
+        </select>
+
+        <button type="submit">Next</button>
+    </form>
+
     <a href='/festivals'>Upcoming festivals</a> </br>
 
     @guest

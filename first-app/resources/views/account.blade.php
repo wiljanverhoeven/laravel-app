@@ -3,12 +3,13 @@
 @section('content')
 <div class="container">
     <h2 class="mb-4">My Account</h2>
+    <a href="{{ route('profile.edit') }}">Edit Profile</a>
 
     <div class="mb-4">
         <h4>Welcome, {{ $user->name }}!</h4>
         <p><strong>Points:</strong> {{ $user->points }}</p>
-        <p><strong>Total Bus Bookings:</strong> {{ $user->total_bus_bookings }}</p>
-        <p><strong>Last Booking Date:</strong> {{ $user->last_bus_booking_date ?? 'N/A' }}</p>
+        <p><strong>Total Bus Bookings:</strong> {{ $total_bus_bookings }}</p>
+        <p><strong>Last Booking Date:</strong> {{ $last_bus_booking_date ? $last_bus_booking_date->format('Y-m-d') : 'N/A' }}</p>
     </div>
 
     <h4>Your Bookings</h4>
