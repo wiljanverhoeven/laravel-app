@@ -67,6 +67,7 @@ class BookingController extends Controller
             $userPoints = $user->points;
             $pointsRequired = 10; // Number of points required for the discount
             $discount = 0;
+            $pointsUsed = false; // Flag to track if points were used
 
             // Check if the user selected to use points
             if ($request->has('use_points') && $userPoints >= $pointsRequired) {
@@ -76,6 +77,8 @@ class BookingController extends Controller
                 // Deduct points from the user
                 $user->points -= $pointsRequired; // Deduct 10 points
                 $user->save();
+                
+                $pointsUsed = true; // Set flag to true since points were used
             }
 
             // Create the booking
@@ -96,12 +99,14 @@ class BookingController extends Controller
 
             // Update bus route capacity
             $busRoute->capacity -= $bookingData['seats'];
-            $busRoute->save();
-
+            
+            // Check conditions to activate the bus route
+            $this->updateBusRouteStatus($busRoute, $pointsUsed);
+            
             // Clear the session booking data
             session()->forget('booking');
 
-            // Redirect to the confirmation page with discount applied
+            // Redirect to the confirmation page with discount
             return redirect()->route('confirmation', ['booking' => $booking->id, 'discount' => $discount]);
         } catch (\Exception $e) {
             // Log error details
@@ -154,6 +159,26 @@ class BookingController extends Controller
 
             // Return an error message
             return back()->with('error', 'There was an issue retrieving your booking details. Please try again.');
+        }
+    }
+
+    private function updateBusRouteStatus(BusRoute $busRoute, bool $pointsUsed = false)
+    {
+        try {
+            // Calculate total booked seats 
+            $totalBookedSeats = Booking::where('bus_route_id', $busRoute->id)
+                ->where('status', 'confirmed')
+                ->sum('number_of_seats');
+            
+            // Update is_active 
+            if ($totalBookedSeats >= 35 || $pointsUsed) {
+                $busRoute->is_active = true;
+                Log::info("Bus route {$busRoute->id} activated: {$totalBookedSeats} seats booked, points used: " . ($pointsUsed ? 'Yes' : 'No'));
+            }
+            
+            $busRoute->save();
+        } catch (\Exception $e) {
+            Log::error('Error updating bus route status: ' . $e->getMessage());
         }
     }
 }

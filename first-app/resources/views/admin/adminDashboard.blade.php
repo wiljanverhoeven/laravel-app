@@ -8,7 +8,10 @@
             @forelse ($users as $user)
                 <div class="bg-white p-4 rounded shadow-md">
                     <p class="font-semibold text-lg">Users & Bookings</p>
-                    <p class="font-semibold text-lg">{{ $user->name }} ({{ $user->email }})</p>
+                    <div class="flex justify-between items-center">
+                        <p class="font-semibold text-lg">{{ $user->name }} ({{ $user->email }})</p>
+                        <a href="{{ route('users.edit', $user) }}" class="text-blue-500 hover:text-blue-700">Edit</a>
+                    </div>
 
                     <!-- Booking List -->
                     <ul class="list-disc pl-5">
@@ -16,8 +19,8 @@
                             <div class="max-h-40 overflow-y-auto">
                                 @foreach ($user->bookings as $booking)
                                     <li>
-                                        <strong>Festival:</strong> {{ $booking->festival->name ?? 'N/A' }},
-                                        <strong>Bus:</strong> {{ $booking->busRoute->departure ?? 'N/A' }},
+                                        <strong>Festival:</strong> {{ $booking->festival->id ?? 'N/A' }},
+                                        <strong>Bus:</strong> {{ $booking->busRoute->departure_date ?? 'N/A' }},
                                         <strong>Date:</strong> {{ $booking->created_at->format('Y-m-d') }}
                                     </li>
                                 @endforeach
@@ -25,8 +28,8 @@
                         @else
                             @foreach ($user->bookings as $booking)
                                 <li>
-                                    <strong>Festival:</strong> {{ $booking->festival->name ?? 'N/A' }},
-                                    <strong>Bus:</strong> {{ $booking->busRoute->departure ?? 'N/A' }},
+                                    <strong>Festival:</strong> {{ $booking->festival->id ?? 'N/A' }},
+                                    <strong>Bus:</strong> {{ $booking->busRoute->departure_date ?? 'N/A' }},
                                     <strong>Date:</strong> {{ $booking->created_at->format('Y-m-d') }}
                                 </li>
                             @endforeach

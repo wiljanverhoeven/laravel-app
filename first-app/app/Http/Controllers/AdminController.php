@@ -13,13 +13,13 @@ class AdminController extends Controller
     {
         try {
             // Fetch users with their bookings, related festivals, and bus routes
-            $users = User::with(['bookings.festival', 'bookings.busRoute'])->paginate(3);
+            $users = User::with('bookings.festival', 'bookings.busRoute')->paginate(3, ['*'], 'users_page');
 
             // Fetch all festivals
-            $festivals = Festival::paginate(10);
+            $festivals = Festival::paginate(10, ['*'], 'festivals_page');
 
             // Fetch all bus routes with related festival
-            $busRoutes = BusRoute::paginate(10);
+            $busRoutes = BusRoute::with('festival')->paginate(10, ['*'], 'routes_page');
 
             // Return view with the data
             return view('admin.adminDashboard', compact('users', 'festivals', 'busRoutes'));

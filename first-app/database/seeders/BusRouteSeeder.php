@@ -66,7 +66,7 @@ class BusRouteSeeder extends Seeder
             'arrival_date' => $returnDate, // Use the return date as arrival date
             'capacity' => 50,
             'price' => $price,
-            'is_active' => true,
+            'is_active' => false,
         ]);
     }
 

@@ -9,6 +9,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminBusRouteController;
 use App\Http\Controllers\AdminFestivalController;
+use App\Http\Controllers\AdminUserController;
 use App\Models\Festival;
 
 // Route for bus route creation
@@ -53,6 +54,12 @@ Route::get('/dashboard', function () {
 
 // Admin routes
 Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+
+
+// User management routes
+Route::get('/users/{user}/edit', [App\Http\Controllers\AdminUserController::class, 'edit'])->name('users.edit');
+Route::put('/users/{user}', [App\Http\Controllers\AdminUserController::class, 'update'])->name('users.update');
+Route::delete('/users/{user}', [App\Http\Controllers\AdminUserController::class, 'destroy'])->name('users.destroy');
 
 // Admin Festival routes
 Route::get('/festivals/create', [AdminFestivalController::class, 'create'])->name('admin.festivals.create');
