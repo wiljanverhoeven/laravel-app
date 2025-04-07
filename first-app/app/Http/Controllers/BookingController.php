@@ -7,27 +7,20 @@ use App\Models\Booking;
 use App\Models\BusRoute;
 use App\Models\Festival;
 use Illuminate\Support\Facades\Auth;
-
-
+use Illuminate\Support\Facades\Log;
 
 class BookingController extends Controller
 {
-   
-
     public function payment()
     {
         // Ensure the user is authenticated
         $user = Auth::user();
-
-        // If the user is not logged in, redirect to the login page
         if (!$user) {
             return redirect()->route('login')->with('error', 'You need to be logged in to proceed.');
         }
 
         // Retrieve booking data from session
         $booking = session('booking');
-
-        // Check if session has booking details
         if (!$booking) {
             return redirect()->route('busses')->with('error', 'No booking found. Please select a bus first.');
         }
@@ -43,73 +36,83 @@ class BookingController extends Controller
         return view('payment', compact('booking', 'userPoints', 'pointsRequired', 'canUsePoints'));
     }
 
-    
     public function processPayment(Request $request)
     {
-        $bookingData = session('booking');
+        // Store the checkbox state in session
+        session(['use_points' => $request->has('use_points')]);
 
-        // Ensure that the user is logged in
-        $user = Auth::user();
-        if (!$user) {
-            return redirect()->route('login')->with('error', 'You need to be logged in to proceed.');
-        }
+        try {
+            $bookingData = session('booking');
 
-        // Retrieve the festival and bus route
-        $festival = Festival::find($bookingData['festival_id']);
-        if (!$festival) {
-            return redirect()->route('busses')->with('error', 'Festival not found. Please start again.');
-        }
+            // Ensure that the user is logged in
+            $user = Auth::user();
+            if (!$user) {
+                return redirect()->route('login')->with('error', 'You need to be logged in to proceed.');
+            }
 
-        if (!$bookingData) {
-            return redirect()->route('busses')->with('error', 'No booking found. Please start again.');
-        }
+            // Retrieve the festival and bus route
+            $festival = Festival::find($bookingData['festival_id']);
+            if (!$festival) {
+                return redirect()->route('busses')->with('error', 'Festival not found. Please start again.');
+            }
 
-        $busRoute = BusRoute::findOrFail($bookingData['bus_route_id']);
-        $totalPrice = $busRoute->price * $bookingData['seats'];
+            if (!$bookingData) {
+                return redirect()->route('busses')->with('error', 'No booking found. Please start again.');
+            }
 
-        // Check if user is eligible for discount
-        $userPoints = $user->points;
-        $pointsRequired = 10; // Number of points required for the discount
-        $discount = 0;
+            $busRoute = BusRoute::findOrFail($bookingData['bus_route_id']);
+            $totalPrice = $busRoute->price * $bookingData['seats'];
 
-        // Check if the user selected to use points
-        if ($request->has('use_points') && $userPoints >= $pointsRequired) {
-            $discount = $totalPrice * 0.30; // 30% discount
-            $totalPrice -= $discount;
+            // Check if user is eligible for discount
+            $userPoints = $user->points;
+            $pointsRequired = 10; // Number of points required for the discount
+            $discount = 0;
 
-            // Deduct points from the user
-            $user->points -= $pointsRequired; // Deduct 10 points
+            // Check if the user selected to use points
+            if ($request->has('use_points') && $userPoints >= $pointsRequired) {
+                $discount = $totalPrice * 0.30; // 30% discount
+                $totalPrice -= $discount;
+
+                // Deduct points from the user
+                $user->points -= $pointsRequired; // Deduct 10 points
+                $user->save();
+            }
+
+            // Create the booking
+            $booking = new Booking();
+            $booking->user_id = $user->id;
+            $booking->festival_id = $bookingData['festival_id'];
+            $booking->bus_route_id = $bookingData['bus_route_id'];
+            $booking->number_of_seats = $bookingData['seats'];
+            $booking->booking_reference = strtoupper(bin2hex(random_bytes(5)));
+            $booking->status = 'confirmed';
+            $booking->payment_status = 'paid';
+            $booking->total_price = $totalPrice;
+            $booking->save();
+
+            // Add 1 point for booking
+            $user->points += 1;
             $user->save();
 
+            // Update bus route capacity
+            $busRoute->capacity -= $bookingData['seats'];
+            $busRoute->save();
+
+            // Clear the session booking data
+            session()->forget('booking');
+
+            // Redirect to the confirmation page with discount applied
+            return redirect()->route('confirmation', ['booking' => $booking->id, 'discount' => $discount]);
+        } catch (\Exception $e) {
+            // Log error details
+            Log::error('Error processing payment: ' . $e->getMessage());
+
+            // Return an error message to the user
+            return back()->with('error', 'There was an issue processing your payment. Please try again.');
         }
-
-        // Create the booking
-        $booking = new Booking();
-        $booking->user_id = $user->id;
-        $booking->festival_id = $bookingData['festival_id'];
-        $booking->bus_route_id = $bookingData['bus_route_id'];
-        $booking->number_of_seats = $bookingData['seats'];
-        $booking->booking_reference = strtoupper(bin2hex(random_bytes(5)));
-        $booking->status = 'confirmed';
-        $booking->payment_status = 'paid';
-        $booking->total_price = $totalPrice;
-        $booking->save();
-
-        // Add 1 point for booking
-        $user->points += 1;
-        $user->save();
-
-        $busRoute->capacity -= $bookingData['seats'];
-        $busRoute->save();
-        
-        // Clear the session booking data
-        session()->forget('booking');
-        // Redirect to the confirmation page with discount applied
-        return redirect()->route('confirmation', ['booking' => $booking->id, 'discount' => $discount]);
     }
 
 
-    
     public function store(Request $request)
     {
         // First validate the input
@@ -139,17 +142,18 @@ class BookingController extends Controller
         return redirect()->route('payment');
     }
 
-
-
     public function confirmation(Booking $booking, Request $request)
     {
-        $booking->load('festival'); 
+        try {
+            $booking->load('festival');
+            $discount = $request->query('discount', 0);
+            return view('confirmation', compact('booking', 'discount'));
+        } catch (\Exception $e) {
+            // Log error details
+            Log::error('Error loading booking confirmation: ' . $e->getMessage());
 
-        $discount = $request->query('discount', 0);
-        return view('confirmation', compact('booking', 'discount'));
+            // Return an error message
+            return back()->with('error', 'There was an issue retrieving your booking details. Please try again.');
+        }
     }
-
-
-   
-   
 }

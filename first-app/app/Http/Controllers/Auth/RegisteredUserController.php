@@ -38,17 +38,19 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // Check if the role is 'admin'
+        $role = $request->has('role') && $request->role == 'admin' ? 'admin' : 'user';
+
         // Create the user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            // Optional: Initialize points or other custom fields
             'points' => 0,
         ]);
 
-        // Automatically assign the 'user' role to the new user
-        $user->assignRole('user'); // Make sure 'user' role exists in the database
+        // Assign the appropriate role
+        $user->assignRole($role); // Assign 'admin' or 'user' based on checkbox
 
         // Fire the Registered event
         event(new Registered($user));
@@ -57,6 +59,6 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Redirect to the dashboard or another page
-        return redirect(route('dashboard'));
+        return redirect(route('home'));
     }
 }

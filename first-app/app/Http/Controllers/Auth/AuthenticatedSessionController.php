@@ -25,7 +25,7 @@ class AuthenticatedSessionController extends Controller
         $user->last_login_at = now();
         $user->save();
 
-        return redirect()->intended('dashboard');
+        return redirect(route('home'));
     }
 
     public function destroy(Request $request)
@@ -36,6 +36,6 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect(route('home'));
     }
 }

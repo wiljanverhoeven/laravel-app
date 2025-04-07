@@ -10,18 +10,16 @@ class BusRoute extends Model
 
     
     protected $fillable = [
-        'festival_id',
         'departure_location',
         'departure_address',
-        'departure_coordinates',
         'departure_date',
         'arrival_date',
         'capacity',
         'price',
+        'festival_id',
         'is_active',
     ];
 
-   
     protected $casts = [
         'departure_date' => 'datetime',
         'arrival_date' => 'datetime',

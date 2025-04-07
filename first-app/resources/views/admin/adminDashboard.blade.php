@@ -1,42 +1,85 @@
-<x-layout>
+@extends('layouts.app')
+
+@section('content')
     <div class="max-w-7xl mx-auto p-6 space-y-10">
-        <x-admin.section title="Users & Bookings">
-            @foreach ($users as $user)
-                <div class="border-b pb-2">
-                    <p class="font-semibold">{{ $user->name }} ({{ $user->email }})</p>
+
+        <!-- Users and Bookings-->
+        <x-admin.section title="">
+            @forelse ($users as $user)
+                <div class="bg-white p-4 rounded shadow-md">
+                    <p class="font-semibold text-lg">Users & Bookings</p>
+                    <p class="font-semibold text-lg">{{ $user->name }} ({{ $user->email }})</p>
+
+                    <!-- Booking List -->
                     <ul class="list-disc pl-5">
-                        @forelse ($user->bookings as $booking)
-                            <li>
-                                Festival: {{ $booking->festival->name ?? 'N/A' }},
-                                Bus: {{ $booking->busRoute->departure ?? 'N/A' }},
-                                Date: {{ $booking->created_at->format('Y-m-d') }}
-                            </li>
-                        @empty
-                            <li>No bookings</li>
-                        @endforelse
+                        @if ($user->bookings->count() > 3)
+                            <div class="max-h-40 overflow-y-auto">
+                                @foreach ($user->bookings as $booking)
+                                    <li>
+                                        <strong>Festival:</strong> {{ $booking->festival->name ?? 'N/A' }},
+                                        <strong>Bus:</strong> {{ $booking->busRoute->departure ?? 'N/A' }},
+                                        <strong>Date:</strong> {{ $booking->created_at->format('Y-m-d') }}
+                                    </li>
+                                @endforeach
+                            </div>
+                        @else
+                            @foreach ($user->bookings as $booking)
+                                <li>
+                                    <strong>Festival:</strong> {{ $booking->festival->name ?? 'N/A' }},
+                                    <strong>Bus:</strong> {{ $booking->busRoute->departure ?? 'N/A' }},
+                                    <strong>Date:</strong> {{ $booking->created_at->format('Y-m-d') }}
+                                </li>
+                            @endforeach
+                        @endif
                     </ul>
                 </div>
-            @endforeach
+            @empty
+                <p>No users available.</p>
+            @endforelse
+            <div class="mt-4">
+                {{ $users->links() }}
+            </div>
         </x-admin.section>
 
-        <x-admin.section title="Manage Festivals">
-            <a href="{{ route('admin.festivals.create') }}" class="btn-blue mb-4">Add Festival</a>
-            @foreach ($festivals as $festival)
-                <div class="bg-gray-100 p-3 rounded mb-2">
-                    {{ $festival->name }}
-                    <a href="{{ route('admin.festivals.edit', $festival) }}" class="text-blue-500 ml-4">Edit</a>
-                </div>
-            @endforeach
+        <!-- Festivals -->
+        <x-admin.section title="">
+            <div class="bg-white p-4 rounded shadow-md">
+            <p class="font-semibold text-lg">Manage Festivals</p>
+            <a href="{{ route('admin.festivals.create') }}" class="btn-blue mb-4 inline-block">Add Festival</a>
+                @forelse ($festivals as $festival)
+                    <div class="bg-gray-100 p-4 rounded mb-3 flex justify-between items-center">
+                        <span>{{ $festival->name }}</span>
+                        <a href="{{ route('admin.festivals.edit', $festival) }}" class="text-blue-500 hover:text-blue-700">Edit</a>
+                    </div>
+                @empty
+                    <p>No festivals available. Please add some festivals.</p>
+                @endforelse
+            </div>
+
+            <div class="mt-4">
+                {{ $festivals->links() }}
+            </div>
         </x-admin.section>
 
-        <x-admin.section title="Manage Bus Routes">
-            <a href="{{ route('admin.busroutes.create') }}" class="btn-green mb-4">Add Bus Route</a>
-            @foreach ($busRoutes as $route)
-                <div class="bg-gray-100 p-3 rounded mb-2">
-                    {{ $route->departure }} → {{ $route->arrival }} ({{ $route->festival->name ?? 'No Festival' }})
-                    <a href="{{ route('admin.busroutes.edit', $route) }}" class="text-green-500 ml-4">Edit</a>
-                </div>
-            @endforeach
+        <!-- Bus Routes-->
+        <x-admin.section title="">
+            <div class="bg-white p-4 rounded shadow-md">
+                <p class="font-semibold text-lg">Manage Bus Routes</p>
+                <a href="{{ route('admin.busroutes.create') }}" class="btn-green mb-4 inline-block">Add Bus Route</a>
+                @forelse ($busRoutes as $route)
+                    <div class="bg-gray-100 p-4 rounded mb-3 flex justify-between items-center">
+                        <span>{{ $route->departure_date }} → {{ $route->arrival_date }} {{ $route->festival->name ?? 'No Festival' }} from {{ $route->departure_location }}</span>
+                        <a href="{{ route('admin.busroutes.edit', $route) }}" class="text-green-500 hover:text-green-700">Edit</a>
+                    </div>
+                @empty
+                    <p>No bus routes available. Please add some routes.</p>
+                @endforelse
+            </div>
+
+            <div class="mt-4">
+                {{ $busRoutes->links() }}
+            </div>
         </x-admin.section>
+
     </div>
-</x-layout>
+@endsection

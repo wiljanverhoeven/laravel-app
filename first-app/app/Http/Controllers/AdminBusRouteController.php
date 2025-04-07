@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\BusRoute;
 use Illuminate\Http\Request;
 use App\Models\Festival;
-
+use Illuminate\Support\Facades\Log;
 class AdminBusRouteController extends Controller {
 
     // Method for creating a new BusRoute (returns the form view)
@@ -17,33 +17,46 @@ class AdminBusRouteController extends Controller {
     // Method for storing the new BusRoute
     public function store(Request $request)
     {
-        // Validate incoming data
-        $request->validate([
-            'departure_location' => 'required|string|max:255',
-            'departure_address' => 'required|string',
-            'departure_date' => 'required|date',
-            'arrival_date' => 'required|date',
-            'capacity' => 'required|integer|min:1',
-            'price' => 'required|numeric|min:0',
-            'festival_id' => 'required|exists:festivals,id',
-            'is_active' => 'nullable|boolean',
-        ]);
+        try {
+            // Convert checkbox value before validation
+            $request->merge([
+                'is_active' => $request->has('is_active') ? true : false,
+            ]);
+
+            if ($request->has('departure_date') && !str_contains($request->departure_date, 'T')) {
+                // Convert "2025-04-07 10:14:00" to "2025-04-07T10:14"
+                $request->merge([
+                    'departure_date' => date('Y-m-d\TH:i', strtotime($request->departure_date))
+                ]);
+            }
+            
+            if ($request->has('arrival_date') && !str_contains($request->arrival_date, 'T')) {
+                // Convert "2025-04-07 10:14:00" to "2025-04-07T10:14"
+                $request->merge([
+                    'arrival_date' => date('Y-m-d\TH:i', strtotime($request->arrival_date))
+                ]);
+            }
+
+            // Validate incoming data
+            $validated = $request->validate([
+                'departure_location' => 'required|string|max:255',
+                'departure_address' => 'required|string',
+                'departure_date' => 'required|date_format:Y-m-d\TH:i',
+                'arrival_date' => 'required|date_format:Y-m-d\TH:i',
+                'capacity' => 'required|integer|min:1',
+                'price' => 'required|numeric|min:0',
+                'festival_id' => 'required|exists:festivals,id',
+                'is_active' => 'boolean',
+            ]);
 
         // Create a new bus route record
-        BusRoute::create([
-            'departure_location' => $request->departure_location,
-            'departure_address' => $request->departure_address,
-            'departure_date' => $request->departure_date,
-            'arrival_date' => $request->arrival_date,
-            'capacity' => $request->capacity,
-            'price' => $request->price,
-            'festival_id' => $request->festival_id,
-            'is_active' => $request->has('is_active') ? true : false,  // Handle checkbox for active status
-        ]);
-
-        // Redirect back to the bus route creation page with a success message
-        return redirect()->route('admin.busroutes.create')->with('success', 'Bus route added successfully!');
+        BusRoute::create($validated);
+        return redirect()->route('admin.dashboard')->with('success', 'Bus route created successfully!');
+    } catch (\Exception $e) {
+        Log::error('Error creating bus route: ' . $e->getMessage());
+        return back()->withInput()->with('error', 'Error creating bus route: ' . $e->getMessage());
     }
+}
 
     // Method for editing an existing BusRoute
     public function edit(BusRoute $busRoute)
@@ -55,17 +68,60 @@ class AdminBusRouteController extends Controller {
     // Method for updating an existing BusRoute
     public function update(Request $request, BusRoute $busRoute)
     {
-        // Validate the incoming data
-        $request->validate([
-            'departure' => 'required|string|max:255',
-            'arrival' => 'required|string|max:255',
-            'festival_id' => 'required|exists:festivals,id',  // Ensure festival_id exists in the festivals table
-        ]);
+        try {
+            // Convert checkbox value
+            $request->merge([
+                'is_active' => $request->has('is_active') ? true : false,
+            ]);
+            
+            // Convert date formats if needed
+            if ($request->has('departure_date') && !str_contains($request->departure_date, 'T')) {
+                // Convert "2025-04-07 10:14:00" to "2025-04-07T10:14"
+                $request->merge([
+                    'departure_date' => date('Y-m-d\TH:i', strtotime($request->departure_date))
+                ]);
+            }
+            
+            if ($request->has('arrival_date') && !str_contains($request->arrival_date, 'T')) {
+                // Convert "2025-04-07 10:14:00" to "2025-04-07T10:14"
+                $request->merge([
+                    'arrival_date' => date('Y-m-d\TH:i', strtotime($request->arrival_date))
+                ]);
+            }
+            
+            Log::info('Modified request data with formatted dates:', $request->all());
 
-        // Update the busRoute with new data
-        $busRoute->update($request->all());
+            // Rest of your validation and update code...
+            $validated = $request->validate([
+                'departure_location' => 'required|string|max:255',
+                'departure_address' => 'required|string',
+                'departure_date' => 'required|date_format:Y-m-d\TH:i',
+                'arrival_date' => 'required|date_format:Y-m-d\TH:i',
+                'capacity' => 'required|integer|min:1',
+                'price' => 'required|numeric|min:0',
+                'festival_id' => 'required|exists:festivals,id',
+                'is_active' => 'boolean',
+            ]);
+            
+            $busRoute->update($validated);
+            
+            return redirect()->route('admin.dashboard')->with('success', 'Bus route updated successfully!');
+        } catch (\Exception $e) {
+            Log::error('Error updating bus route: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Error updating bus route: ' . $e->getMessage());
+        }
+    }
 
-        // Redirect after update
-        return redirect()->route('admin.adminDashboard')->with('success', 'Bus route updated successfully!');
+    public function destroy(BusRoute $busRoute)
+    {
+        try {
+            // Delete the bus route
+            $busRoute->delete();
+
+            return redirect()->route('admin.dashboard')->with('success', 'Bus route deleted successfully!');
+        } catch (\Exception $e) {
+            Log::error('Error deleting bus route: ' . $e->getMessage());
+            return back()->with('error', 'Error deleting bus route: ' . $e->getMessage());
+        }
     }
 }

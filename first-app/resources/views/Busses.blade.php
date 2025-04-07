@@ -1,28 +1,52 @@
-<x-layout>
-    <h1>Choose Your Bus for {{ $festival->name }}</h1>
+@extends('layouts.app')
 
-    <form action="{{ route('booking.store') }}" method="POST">
-        @csrf
-        <input type="hidden" name="festival_id" value="{{ $festival->id }}">
+@section('content')
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    <h1 class="text-2xl font-semibold mb-6">Choose Your Bus for {{ $festival->name }}</h1>
 
-        <label for="bus_route">Choose a bus:</label>
-        <select name="bus_route_id" id="bus_route" required>
-            <option value="">Select a Route</option>
-            @foreach ($busRoutes as $busRoute)
-                <option value="{{ $busRoute->id }}">
-                    {{ $busRoute->departure_location }} → {{ $festival->name }}
-                    (Arrives: {{ \Carbon\Carbon::parse($busRoute->arrival_date)->format('d M Y, H:i') }})
-                </option>
-            @endforeach
-        </select>
+                    <form action="{{ route('booking.store') }}" method="POST" class="space-y-6">
+                        @csrf
+                        <input type="hidden" name="festival_id" value="{{ $festival->id }}">
 
-        <label for="seats">Number of seats:</label>
-        <input type="number" name="seats" id="seats" min="1" required>
+                        <!-- Bus Route Selection -->
+                        <div>
+                            <label for="bus_route" class="block font-medium text-white">Choose a bus:</label>
+                            <select name="bus_route_id" id="bus_route" class="w-full bg-white border-white rounded-lg text-black" required>
+                                <option value="">Select a Route</option>
+                                @foreach ($busRoutes as $busRoute)
+                                    <option value="{{ $busRoute->id }}">
+                                        {{ $busRoute->departure_location }} → {{ $festival->name }}
+                                        (Arrives: {{ \Carbon\Carbon::parse($busRoute->arrival_date)->format('d M Y, H:i') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('bus_route_id')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
 
-        @error('seats')
-            <div style="color: red;">{{ $message }}</div>
-        @enderror
 
-        <button type="submit">Book Now</button>
-    </form>
-</x-layout>
+                        <!-- Seat Selection -->
+                        <div>
+                            <label for="seats" class="block font-medium text-white">Number of seats:</label>
+                            <input type="number" name="seats" id="seats" min="1" class="w-full border-white rounded-lg bg-white text-black" required>
+                            @error('seats')
+                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="mt-4">
+                            <button type="submit" class="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Book Now
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
